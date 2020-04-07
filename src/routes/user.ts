@@ -3,7 +3,7 @@ import express, { Router } from 'express';
 import { createUser, loginUser } from '../controllers/user';
 
 // Setup Router
-const router = express.Router();
+const router = <Router> express.Router();
 
 // Create Users
 router.post('/api/v1/users/signup', createUser);
