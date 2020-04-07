@@ -1,6 +1,9 @@
-const User = require('../models/user');
+import express, { Request, Response } from 'express';
+import {User} from '../models/user';
+
+
 // Signup Controller
-const createUser = async (req, res) => {
+export const createUser = async (req :Request, res: Response) => {
   const user = new User(req.body);
   try {
     // Initiate Save
@@ -14,16 +17,12 @@ const createUser = async (req, res) => {
 };
 
 // Login Controller
-const loginUser = async (req, res) => {
+export const loginUser = async (req :Request, res: Response) => {
   const { email, password } = req.body;
   try {
-    const user = await User.findByCredentials(email, password);
+    const user = await User.schema.statics.findByCredentials(email, password);
+    res.send(user);
   } catch (error) {
     res.status(400).send({ error });
   }
-};
-
-module.exports = {
-  createUser,
-  loginUser,
 };

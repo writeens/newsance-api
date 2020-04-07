@@ -1,8 +1,17 @@
 /* eslint-disable no-use-before-define */
-const mongoose = require('mongoose');
-const validator = require('validator');
+import {Request, Response, NextFunction} from 'express'
+import mongoose, { HookNextFunction, Schema, Document } from 'mongoose';
+import validator from 'validator';
 
-const { Schema } = mongoose;
+export interface IUser extends Document {
+  firstName:string,
+  lastName: string,
+  email: string,
+  password: string,
+  categories: string[],
+  countries: string[],
+  token: string[],
+}
 
 // Create Category Schema
 const categorySchema = new Schema({
@@ -49,10 +58,11 @@ const userSchema = new Schema({
     lowercase: true,
     required: true,
     trim: true,
-    validate(value) {
+    validate(value:string):boolean {
       if (!validator.isEmail(value)) {
         throw new Error('Email is invalid');
       }
+      return true;
     },
   },
   password: {
@@ -60,7 +70,7 @@ const userSchema = new Schema({
     required: true,
     trim: true,
     minlength: 7,
-    validate(value) {
+    validate(value:string):boolean {
       const lettersRegex = /[A-Za-z]/;
       const specialCharcterRegex = /\W/;
       const numberRegex = /\d/;
@@ -70,6 +80,7 @@ const userSchema = new Schema({
       if (!hasSpecialCharacter || !hasNumber || !hasLetters) {
         throw new Error('Password is invalid');
       }
+      return true;
     },
   },
   categories: [categorySchema],
@@ -80,19 +91,17 @@ const userSchema = new Schema({
 // Setup Method to generate Auth Token
 
 // Setup Statics on Mongoose to Query entire DB (Model)
-userSchema.statics.findByCredentials = async function (email, password) {
+userSchema.statics.findByCredentials = async function (email:string, password:string):Promise<IUser> {
   // Check for document with email in DB
   const userData = await User.findOne({ email });
   if (!userData) {
     throw new Error('Unable to Login');
   }
+  
+  return userData;
 };
 
-// Mongoose Hook to has the password before saving
-userSchema.pre('save', async (req, res, next) => {
-});
-
 // Compile User Schema into a Model
-const User = mongoose.model('User', userSchema);
+export const User = mongoose.model <IUser> ('User', userSchema);
 
-module.exports = User;
+
