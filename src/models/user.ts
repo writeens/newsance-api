@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-use-before-define */
 import mongoose, {
-  Schema, HookNextFunction, Document, Model,
+  Schema, HookNextFunction,
 } from 'mongoose';
 import validator from 'validator';
 import bcrypt from 'bcryptjs';
@@ -14,7 +14,7 @@ config();
 
 // Create Category Schema
 const categorySchema = new Schema({
-  name: {
+  category: {
     type: String,
     lowercase: true,
     trim: true,
@@ -84,7 +84,12 @@ const userSchema = new Schema({
     },
   },
   categories: [categorySchema],
-  countries: [countrySchema],
+  country: {
+    type: String,
+    trim: true,
+    lowercase: true,
+    default: '',
+  },
   tokens: [tokenSchema],
 });
 

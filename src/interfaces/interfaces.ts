@@ -1,5 +1,4 @@
 import { Document, Model } from 'mongoose';
-import { Response, Request, NextFunction } from 'express';
 
 // Create interface for IUser
 export interface IUser extends Document {
@@ -7,9 +6,12 @@ export interface IUser extends Document {
   lastName: string,
   email: string,
   password: string,
-  categories: string[],
-  countries: string[],
+  categories: object[],
+  country: string,
   tokens: object[],
+  // Index Signature for mapping
+  [index: string]: any
+  // Type checking functions
   generateAuthToken: () => string
 }
 
