@@ -1,21 +1,16 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-use-before-define */
-import mongoose, { Schema, HookNextFunction, Document } from 'mongoose';
+import mongoose, {
+  Schema, HookNextFunction, Document, Model,
+} from 'mongoose';
 import validator from 'validator';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { config } from 'dotenv';
+import { IUser, IUserModel } from '../interfaces/interfaces';
 
+// Allow DotEnv config to use the ENV file
 config();
-
-interface IUser extends Document {
-  firstName:string,
-  lastName: string,
-  email: string,
-  password: string,
-  categories: string[],
-  countries: string[],
-  token: string[],
-}
-
 
 // Create Category Schema
 const categorySchema = new Schema({
@@ -37,7 +32,7 @@ const countrySchema = new Schema({
 
 // Create Tokens Schema
 const tokenSchema = new Schema({
-  name: {
+  token: {
     type: String,
     required: true,
   },
@@ -93,27 +88,60 @@ const userSchema = new Schema({
   tokens: [tokenSchema],
 });
 
+
+/** *
+ * Methods on Documents
+ * Statics on Models
+ */
 // Setup Method to generate Auth Token
+userSchema.methods.generateAuthToken = async function () {
+  const user = this;
+  // Generate Token
+  const token :string = jwt.sign({ _id: user._id.toString() }, `${process.env.SECRET}`);
+
+  // Update the tokens array
+  user.tokens = user.tokens.concat({ token });
+
+  // Save data with the updated token list
+  await user.save();
+
+  // return token;
+  return token;
+};
 
 // Setup Statics on Mongoose to Query entire DB (Model)
 userSchema.statics.findByCredentials = async function (email:string, password:string) {
   // Check for document with email in DB
   const userData = await User.findOne({ email });
+
   if (!userData) {
+    console.log('Unable to Login Email');
+    throw new Error('Unable to Login');
+  }
+
+  const isMatch = await bcrypt.compare(password, userData.password);
+
+  // Check if password in DB matches password provided
+  if (!isMatch) {
+    console.log('Unable to Login Password');
     throw new Error('Unable to Login');
   }
 
   return userData;
 };
 
-// Hash Password on save
+// Hash Password before save
 userSchema.pre('save', async function (next:HookNextFunction) {
   const user = <IUser> this;
-  const hash: string = await bcrypt.hash(user.password, 8);
-  user.password = hash;
-  console.log('Before Save, Hashing Password...');
+
+  // Hash the password only when it is modified
+  // Remember that at initialization, the password is at default value
+  if (user.isModified('password')) {
+    const hash: string = await bcrypt.hash(user.password, 8);
+    user.password = hash;
+  }
   next();
 });
 
 // Compile User Schema into a Model
-export const User = mongoose.model<IUser>('User', userSchema);
+export const User:IUserModel = mongoose.model<IUser, IUserModel>('User', userSchema);
