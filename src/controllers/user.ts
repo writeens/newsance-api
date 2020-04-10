@@ -75,11 +75,11 @@ export const updateUserAccount = async (req:Request, res:Response) => {
   try {
     // Get updates from the req.body
     const updates:string[] = Object.keys(req.body);
+
     // Setup list of allowed Updates
     const allowedUpdates: string[] = ['firstName', 'lastName', 'password', 'email', 'country', 'categories'];
 
     // Make sure all the items currently in the req.body are allowedUpdates
-
     const isValidOperation:boolean = updates.every((update:string) => allowedUpdates.includes(update));
 
     // If an invalid update operation is detected return error message
@@ -90,18 +90,7 @@ export const updateUserAccount = async (req:Request, res:Response) => {
     }
 
     // Update the individual properties on the Model instance and save to the DB
-    updates.forEach((update:string) => {
-      if (update === 'categories') {
-        // Empty Array
-        req.user[update] = [];
-        // Concatenate updated items to the array
-        req.body[update].forEach((category:string) => {
-          req.user[update] = req.user[update].concat({ category });
-        });
-      } else {
-        req.user[update] = req.body[update];
-      }
-    });
+    updates.forEach((update:string) => { req.user[update] = req.body[update]; });
 
     // Save to DB
     await req.user.save();
@@ -125,5 +114,14 @@ export const deleteAccount = async (req:Request, res:Response) => {
     });
   } catch (error) {
     res.status(500).send();
+  }
+};
+
+// View User Profile
+export const viewAccount = async (req:Request, res:Response) => {
+  try {
+    res.send(req.user);
+  } catch (error) {
+    res.send(400).send();
   }
 };

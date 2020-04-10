@@ -1,4 +1,4 @@
-import { Document, Model } from 'mongoose';
+import { Document, Model, Schema } from 'mongoose';
 
 // Create interface for IUser
 export interface IUser extends Document {
@@ -24,4 +24,29 @@ export interface IUserModel extends Model<IUser> {
 export interface decodedType {
   _id:string,
   iat:number
+}
+
+// Interface for NewsArticles
+export interface NewsArticles extends Object{
+  author:string,
+  title:string,
+  content:string,
+  publishedAt:Date,
+  newsUrl:string,
+  imageUrl:string,
+  newsId:string,
+  owner:Schema.Types.ObjectId,
+}
+
+// Interface for INews
+export interface INews extends Document{
+  author:string,
+  title:string,
+  content:string,
+  publishedAt:Date,
+  newsUrl:string,
+  imageUrl:string,
+  createdAt:Date
+  newsId:string,
+  owner:Schema.Types.ObjectId,
 }

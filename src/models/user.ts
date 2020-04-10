@@ -22,13 +22,13 @@ const categorySchema = new Schema({
 });
 
 // Create Countries Schema
-const countrySchema = new Schema({
-  name: {
-    type: String,
-    lowercase: true,
-    trim: true,
-  },
-});
+// const countrySchema = new Schema({
+//   name: {
+//     type: String,
+//     lowercase: true,
+//     trim: true,
+//   },
+// });
 
 // Create Tokens Schema
 const tokenSchema = new Schema({
@@ -91,8 +91,19 @@ const userSchema = new Schema({
     default: '',
   },
   tokens: [tokenSchema],
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
+/** Virtual Setup */
+// Access all the news by a particular user
+userSchema.virtual('news', {
+  ref: 'News',
+  localField: '_id',
+  foreignField: 'owner',
+});
 
 /** *
  * Methods on Documents

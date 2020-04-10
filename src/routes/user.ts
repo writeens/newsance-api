@@ -8,6 +8,7 @@ import {
   logoutUserAll,
   updateUserAccount,
   deleteAccount,
+  viewAccount,
 } from '../controllers/user';
 // Import authentication
 
@@ -31,5 +32,8 @@ router.put('/api/v1/profile/update', auth, updateUserAccount);
 
 // Delete User account
 router.delete('/api/v1/profile/delete', auth, deleteAccount);
+
+// Get User account
+router.get('/api/v1/profile', auth, viewAccount);
 
 export default router;
