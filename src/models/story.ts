@@ -23,4 +23,12 @@ const storySchema = new Schema({
   },
 });
 
+// Setup Virtual on Story to handle comments
+storySchema.virtual('comments', {
+  ref: 'Comment',
+  localField: '_id',
+  foreignField: 'story',
+});
+
+
 export const Story:Model<IStory> = mongoose.model<IStory>('Story', storySchema);

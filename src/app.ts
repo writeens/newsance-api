@@ -8,6 +8,7 @@ import mongooseDB from './db/mongoose';
 import userRoutes from './routes/user';
 import newsRoutes from './routes/news';
 import storyRoutes from './routes/story';
+import commentRoutes from './routes/comment';
 
 const express = require('express');
 
@@ -16,7 +17,6 @@ mongooseDB();
 
 // Initialize Server
 const app: Express = express();
-
 
 // Prevent cors issues
 app.use(cors());
@@ -28,9 +28,15 @@ app.use(compression());
 // Automatically parse incoming requests
 app.use(express.json());
 
+app.use((req, res, next) => {
+  console.log(`${req.method}`, `${req.path}`);
+  next();
+});
+
 // Setup Routes
 app.use(userRoutes);
 app.use(newsRoutes);
 app.use(storyRoutes);
+app.use(commentRoutes);
 
 export default app;

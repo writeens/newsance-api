@@ -158,7 +158,6 @@ export const getSavedNews = async (req:Request, res:Response) => {
 // eslint-disable-next-line consistent-return
 export const deleteSavedNews = async (req:Request, res:Response) => {
   try {
-    console.log(req.params.id);
     const convertedId = mongoose.Types.ObjectId(`${req.params.id}`);
     const newsItem = await News.findOne({ owner: req.user._id, _id: convertedId });
 

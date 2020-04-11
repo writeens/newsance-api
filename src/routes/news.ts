@@ -14,7 +14,7 @@ import auth from '../middleware/auth';
 const router = <Router> express.Router();
 
 // Get News Feed
-router.get('/api/v1/news/feed', auth, getFeed);
+router.get('/api/v1/feed/news', auth, getFeed);
 
 // Search for News Item
 router.get('/api/v1/news/:query', auth, findNews);

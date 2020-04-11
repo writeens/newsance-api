@@ -5,6 +5,7 @@ import {
   deleteStory,
   getStories,
   getStory,
+  getStoryFeed,
 } from '../controllers/story';
 import auth from '../middleware/auth';
 
@@ -25,5 +26,8 @@ router.get('/api/v1/stories', auth, getStories);
 
 // Get a particular Droplet
 router.get('/api/v1/stories/:id', auth, getStory);
+
+// Get stories feed
+router.get('/api/v1/feed/stories', auth, getStoryFeed);
 
 export default router;

@@ -98,6 +98,7 @@ userSchema.virtual('news', {
   foreignField: 'owner',
 });
 
+
 // Setup Virtual Collection for Stories on User Model
 userSchema.virtual('stories', {
   ref: 'Story',
@@ -131,7 +132,6 @@ userSchema.statics.findByCredentials = async function (email:string, password:st
   const userData = await User.findOne({ email });
 
   if (!userData) {
-    console.log('Unable to Login Email');
     throw new Error('Unable to Login');
   }
 
@@ -139,7 +139,6 @@ userSchema.statics.findByCredentials = async function (email:string, password:st
 
   // Check if password in DB matches password provided
   if (!isMatch) {
-    console.log('Unable to Login Password');
     throw new Error('Unable to Login');
   }
 

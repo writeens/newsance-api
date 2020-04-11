@@ -47,3 +47,12 @@ export interface IStory extends Document{
   // Index Signature for mapping
   [index: string]: any
 }
+
+// Interface for IComments
+export interface IComment extends Document{
+  story:Schema.Types.ObjectId,
+  comment:string,
+  author:Schema.Types.ObjectId
+  // Index Signature for mapping
+  [index: string]: any
+}
