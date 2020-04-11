@@ -8,6 +8,8 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { config } from 'dotenv';
 import { IUser, IUserModel } from '../interfaces/interfaces';
+import News from './news';
+import { Story } from './story';
 
 // Allow DotEnv config to use the ENV file
 config();
@@ -20,15 +22,6 @@ const categorySchema = new Schema({
     trim: true,
   },
 });
-
-// Create Countries Schema
-// const countrySchema = new Schema({
-//   name: {
-//     type: String,
-//     lowercase: true,
-//     trim: true,
-//   },
-// });
 
 // Create Tokens Schema
 const tokenSchema = new Schema({
@@ -105,6 +98,13 @@ userSchema.virtual('news', {
   foreignField: 'owner',
 });
 
+// Setup Virtual Collection for Stories on User Model
+userSchema.virtual('stories', {
+  ref: 'Story',
+  localField: '_id',
+  foreignField: 'author',
+});
+
 /** *
  * Methods on Documents
  * Statics on Models
@@ -156,6 +156,17 @@ userSchema.pre('save', async function (next:HookNextFunction) {
     const hash: string = await bcrypt.hash(user.password, 8);
     user.password = hash;
   }
+  next();
+});
+
+// Cascade Remove all the stories, comments and news associated with account
+userSchema.pre('remove', async function (next:HookNextFunction) {
+  const user = this;
+
+  // Remove all news associated with this account
+  await News.deleteMany({ owner: user._id });
+  // Remove all stories associated with this account
+  await Story.deleteMany({ author: user._id });
   next();
 });
 

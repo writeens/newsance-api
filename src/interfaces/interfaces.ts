@@ -26,18 +26,6 @@ export interface decodedType {
   iat:number
 }
 
-// Interface for NewsArticles
-export interface NewsArticles extends Object{
-  author:string,
-  title:string,
-  content:string,
-  publishedAt:Date,
-  newsUrl:string,
-  imageUrl:string,
-  newsId:string,
-  owner:Schema.Types.ObjectId,
-}
-
 // Interface for INews
 export interface INews extends Document{
   author:string,
@@ -49,4 +37,13 @@ export interface INews extends Document{
   createdAt:Date
   newsId:string,
   owner:Schema.Types.ObjectId,
+}
+
+// Interface for IStories
+export interface IStory extends Document{
+  content:string,
+  createdAt:Date,
+  author:Schema.Types.ObjectId
+  // Index Signature for mapping
+  [index: string]: any
 }
