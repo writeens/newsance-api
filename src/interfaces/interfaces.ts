@@ -6,6 +6,7 @@ export interface IUser extends Document {
   lastName: string,
   email: string,
   password: string,
+  username: string,
   categories: object[],
   country: string,
   tokens: object[],

@@ -19,7 +19,6 @@ const storySchema = new Schema({
   author: {
     type: Schema.Types.ObjectId,
     required: true,
-    ref: 'User',
   },
 });
 
@@ -28,6 +27,13 @@ storySchema.virtual('comments', {
   ref: 'Comment',
   localField: '_id',
   foreignField: 'story',
+});
+
+storySchema.virtual('authorDetails', {
+  ref: 'User',
+  localField: 'author',
+  foreignField: '_id',
+  justOne: true,
 });
 
 

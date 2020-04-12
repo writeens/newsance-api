@@ -5,6 +5,14 @@ import { User } from '../models/user';
 
 // Signup Controller
 export const createUser = async (req :Request, res: Response) => {
+  const userName = await User.findOne({ username: req.body.username });
+
+  // Check if username already exists
+  if (userName) {
+    return res.status(400).send({ error: 'Username has been taken' });
+  }
+
+  // Create a new user
   const user = new User(req.body);
 
   try {
@@ -19,16 +27,16 @@ export const createUser = async (req :Request, res: Response) => {
     res.status(201).send({ user, token });
   } catch (error) {
     console.log(error);
-    res.status(400).send({ error: 'User email already exists' });
+    res.status(400).send();
   }
 };
 
 // Login Controller
 export const loginUser = async (req :Request, res: Response) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
   try {
     // Find the user in DB
-    const user = await User.findByCredentials(email, password);
+    const user = await User.findByCredentials(username, password);
 
     // If user is found, generate token
     const token = await user.generateAuthToken();

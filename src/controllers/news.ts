@@ -159,7 +159,7 @@ export const getSavedNews = async (req:Request, res:Response) => {
 export const deleteSavedNews = async (req:Request, res:Response) => {
   try {
     const convertedId = mongoose.Types.ObjectId(`${req.params.id}`);
-    const newsItem = await News.findOne({ owner: req.user._id, _id: convertedId });
+    const newsItem = await News.findOneAndDelete({ owner: req.user._id, _id: convertedId });
 
     // If item isnt present
     if (!newsItem) {
@@ -167,8 +167,6 @@ export const deleteSavedNews = async (req:Request, res:Response) => {
         message: 'Delete operation unsuccessful',
       });
     }
-    // Remove Item
-    await newsItem.remove();
 
     res.send({
       message: 'Delete operation successful',

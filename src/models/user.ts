@@ -10,6 +10,7 @@ import { config } from 'dotenv';
 import { IUser, IUserModel } from '../interfaces/interfaces';
 import News from './news';
 import { Story } from './story';
+import { Comment } from './comment';
 
 // Allow DotEnv config to use the ENV file
 config();
@@ -88,6 +89,12 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  username: {
+    type: String,
+    required: true,
+    trim: true,
+    lowercase: true,
+  },
 });
 
 /** Virtual Setup */
@@ -97,7 +104,6 @@ userSchema.virtual('news', {
   localField: '_id',
   foreignField: 'owner',
 });
-
 
 // Setup Virtual Collection for Stories on User Model
 userSchema.virtual('stories', {
@@ -127,9 +133,17 @@ userSchema.methods.generateAuthToken = async function () {
 };
 
 // Setup Statics on Mongoose to Query entire DB (Model)
-userSchema.statics.findByCredentials = async function (email:string, password:string) {
+userSchema.statics.findByCredentials = async function (username:string, password:string) {
+  let userData:IUser|null;
+
+  // Check if user provided email
+  if (validator.isEmail(username)) {
+    userData = await User.findOne({ email: username });
+  } else {
+    userData = await User.findOne({ username });
+  }
+
   // Check for document with email in DB
-  const userData = await User.findOne({ email });
 
   if (!userData) {
     throw new Error('Unable to Login');
@@ -164,8 +178,16 @@ userSchema.pre('remove', async function (next:HookNextFunction) {
 
   // Remove all news associated with this account
   await News.deleteMany({ owner: user._id });
+  // Remove all comments made on stories by this account
+  const stories = await Story.find({ author: user._id });
+  stories.forEach(async (story) => {
+    await Comment.deleteMany({ story: story._id });
+  });
   // Remove all stories associated with this account
   await Story.deleteMany({ author: user._id });
+  // Remove all comments made by this account
+  await Comment.deleteMany({ author: user._id });
+
   next();
 });
 

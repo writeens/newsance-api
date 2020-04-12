@@ -4,8 +4,6 @@ import { IComment } from '../interfaces/interfaces';
 const commentSchema = new Schema({
   story: {
     type: Schema.Types.ObjectId,
-    ref: 'Story',
-    required: true,
   },
   comment: {
     type: String,
@@ -23,7 +21,16 @@ const commentSchema = new Schema({
   },
   author: {
     type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
   },
+});
+
+commentSchema.virtual('authorDetails', {
+  ref: 'User',
+  localField: 'author',
+  foreignField: '_id',
+  justOne: true,
 });
 
 export const Comment:Model<IComment> = mongoose.model<IComment>('Comment', commentSchema);

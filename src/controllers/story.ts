@@ -1,6 +1,7 @@
 /* eslint-disable consistent-return */
 import { Request, Response } from 'express';
 import { Story } from '../models/story';
+import { Comment } from '../models/comment';
 import { IStory } from '../interfaces/interfaces';
 
 // Save Story to DB
@@ -33,7 +34,7 @@ export const updateStory = async (req:Request, res:Response) => {
   const isAValidOperation:boolean = updates.every((update) => allowedUpdates.includes(update));
 
   if (!isAValidOperation) {
-    res.status(400).send({ error: 'Invalid updates' });
+    return res.status(400).send({ error: 'Invalid updates' });
   }
 
   try {
@@ -68,8 +69,11 @@ export const deleteStory = async (req:Request, res:Response) => {
     const story = await Story.findOneAndDelete({ _id, author: req.user._id });
 
     if (!story) {
-      res.status(404).send();
+      return res.status(404).send();
     }
+
+    // Delete all the comments by that story
+    await Comment.deleteMany({ story: story._id });
 
     res.send(story);
   } catch (error) {
@@ -80,22 +84,26 @@ export const deleteStory = async (req:Request, res:Response) => {
 // Get Stories associated with this account
 export const getStories = async (req:Request, res:Response) => {
   try {
-    // Populate Virtual
-    await req.user.populate('stories').execPopulate();
+    const stories = await Story.find({ author: req.user._id });
 
-    if (req.user.stories === []) {
+    if (stories === []) {
       return res.status(404).send();
     }
 
-    // Send Response
-    const result = req.user.stories.map((property:any) => ({
-      id: property._id,
-      content: property.content,
-      createdAt: property.createdAt,
-      author: property.author,
-    }));
+    const completedStoriesArray = stories.map(async (story) => {
+      const updatedStories = await story.populate('authorDetails').execPopulate();
+      return {
+        id: updatedStories._id,
+        content: updatedStories.content,
+        createdAt: updatedStories.createdAt,
+        author: updatedStories.authorDetails.username,
+        authorId: updatedStories.author,
+      };
+    });
 
-    res.send(result);
+    const completedStories = await Promise.all(completedStoriesArray);
+    // Send Response
+    res.send(completedStories);
   } catch (error) {
     res.status(500).send();
   }
@@ -106,19 +114,22 @@ export const getStory = async (req:Request, res:Response) => {
   const _id = req.params.id;
   try {
     // Find story in collection(DB)
-    const story = await Story.findOne({ _id, author: req.user._id });
+    let story = await Story.findOne({ _id, author: req.user._id });
 
     // Check if story exists
     if (!story) {
       return res.status(404).send();
     }
 
+    story = await story.populate('authorDetails').execPopulate();
+
     // Send Response to client
     res.send({
       id: story._id,
       content: story.content,
       createdAt: story.createdAt,
-      author: story.author,
+      author: story.authorDetails.username,
+      authorId: story.author,
     });
   } catch (error) {
     res.status(500).send(error);
@@ -132,36 +143,24 @@ export const getStoryFeed = async (req:Request, res:Response) => {
 
     // Check if stories exist in the DB
     if (!stories || stories === []) {
-      res.status(404).send();
+      return res.status(404).send();
     }
 
-    // const completeStories = stories.map(async (story) => {
-    //   // Populate the comments subsection of the story
-    //   const populatedStory = await story.populate('comments').execPopulate();
-    //   let updatedCommentsArray = [];
-    //   if (populatedStory.comments.length > 0) {
-    //     updatedCommentsArray = populatedStory.comments.map((comment:any) => ({
-    //       id: comment._id,
-    //       comment: comment.comment,
-    //       author: comment.author,
-    //       createdAt: comment.createdAt,
-    //     }));
-    //   }
-    //   return {
-    //     id: populatedStory._id,
-    //     content: populatedStory.content,
-    //     createdAt: populatedStory.createdAt,
-    //     author: populatedStory.author,
-    //     comments: updatedCommentsArray,
-    //   };
-    // });
+    const completedStoriesArray = stories.map(async (story) => {
+      const updatedStories = await story.populate('authorDetails').execPopulate();
+      return {
+        id: updatedStories._id,
+        content: updatedStories.content,
+        createdAt: updatedStories.createdAt,
+        author: updatedStories.authorDetails.username,
+        authorId: updatedStories.author,
+      };
+    });
 
-    // Await modified stories
-    // const allStories = await Promise.all(completeStories);
-    // console.log(allStories);
+    const completedStories = await Promise.all(completedStoriesArray);
 
     // Send Response
-    res.send(stories);
+    res.send(completedStories);
   } catch (error) {
     res.status(500).send();
   }
