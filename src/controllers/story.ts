@@ -125,7 +125,6 @@ export const getStory = async (req:Request, res:Response) => {
   }
 };
 
-
 // Get a story feed
 export const getStoryFeed = async (req:Request, res:Response) => {
   try {
@@ -136,33 +135,33 @@ export const getStoryFeed = async (req:Request, res:Response) => {
       res.status(404).send();
     }
 
-    const completeStories = stories.map(async (story) => {
-      // Populate the comments subsection of the story
-      const populatedStory = await story.populate('comments').execPopulate();
-      let updatedCommentsArray = [];
-      if (populatedStory.comments.length > 0) {
-        updatedCommentsArray = populatedStory.comments.map((comment:any) => ({
-          id: comment._id,
-          comment: comment.comment,
-          author: comment.author,
-          createdAt: comment.createdAt,
-        }));
-      }
-      return {
-        id: populatedStory._id,
-        content: populatedStory.content,
-        createdAt: populatedStory.createdAt,
-        author: populatedStory.author,
-        comments: updatedCommentsArray,
-      };
-    });
+    // const completeStories = stories.map(async (story) => {
+    //   // Populate the comments subsection of the story
+    //   const populatedStory = await story.populate('comments').execPopulate();
+    //   let updatedCommentsArray = [];
+    //   if (populatedStory.comments.length > 0) {
+    //     updatedCommentsArray = populatedStory.comments.map((comment:any) => ({
+    //       id: comment._id,
+    //       comment: comment.comment,
+    //       author: comment.author,
+    //       createdAt: comment.createdAt,
+    //     }));
+    //   }
+    //   return {
+    //     id: populatedStory._id,
+    //     content: populatedStory.content,
+    //     createdAt: populatedStory.createdAt,
+    //     author: populatedStory.author,
+    //     comments: updatedCommentsArray,
+    //   };
+    // });
 
     // Await modified stories
-    const allStories = await Promise.all(completeStories);
+    // const allStories = await Promise.all(completeStories);
     // console.log(allStories);
 
     // Send Response
-    res.send(allStories);
+    res.send(stories);
   } catch (error) {
     res.status(500).send();
   }

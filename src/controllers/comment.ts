@@ -18,7 +18,34 @@ export const saveCommentOnStory = async (req:Request, res:Response) => {
 
 // Update a Comment to a Story Controller
 export const updateCommentOnStory = async (req:Request, res:Response) => {
-//   console.log('object');
+  const _id = req.body.id;
+  const allowedUpdates = ['id', 'comment'];
+  const updates = Object.keys(req.body);
+  const isAValidOperation = updates.every((update) => allowedUpdates.includes(update));
+
+  // Invalid Update on resource
+  if (!isAValidOperation) {
+    res.status(404).send({ error: 'Invalid updates' });
+  }
+
+  try {
+    const commentObject = await Comment.findOne({ _id, author: req.user._id });
+
+    if (!commentObject) {
+      return res.status(404).send({ error: 'Invalid updates' });
+    }
+
+    // Update comment object
+    commentObject.comment = req.body.comment;
+
+    await commentObject.save();
+
+    res.send(commentObject);
+
+    // Update Comment
+  } catch (error) {
+    res.status(500).send();
+  }
 };
 
 // Delete a Comment to a Story Controller

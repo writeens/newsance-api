@@ -6,8 +6,8 @@ const storySchema = new Schema({
     type: String,
     trim: true,
     validate(value:string):boolean {
-      if (value.length > 360) {
-        throw new Error('Content is longer than 360 characters');
+      if (value.length > 360 || value.length < 0) {
+        throw new Error('Content is invalid');
       }
       return true;
     },

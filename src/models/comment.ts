@@ -11,8 +11,8 @@ const commentSchema = new Schema({
     type: String,
     trim: true,
     validate(value:string):boolean {
-      if (value.length > 360) {
-        throw new Error('Comment is too long');
+      if (value.length < 0 || value.length > 360) {
+        throw new Error('Comment is invalid');
       }
       return true;
     },
