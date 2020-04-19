@@ -6,6 +6,7 @@ import { User } from '../models/user';
 
 // Signup Controller
 export const createUser = async (req :Request, res: Response) => {
+  console.log('Hello Here');
   const userName = await User.findOne({ username: req.body.username });
 
   // Check if username already exists
