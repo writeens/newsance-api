@@ -12,7 +12,7 @@ export const getFeed = async (req :Request, res:Response) => {
   let allPromises = [];
 
   // Function to get feed from api based on criteria
-  const getCategoryFeed = async (category:string, country:string, page:number) => axios.get(`${process.env.BASE_API_URL}/top-headlines?country=${country}&category=${category}&pageSize=4&page=${page}`, {
+  const getCategoryFeed = async (category:string, country:string, page:number) => axios.get(`${process.env.BASE_NEWS_API_URL}/top-headlines?country=${country}&category=${category}&pageSize=4&page=${page}`, {
     headers: { Authorization: `Bearer ${process.env.NEWS_API_KEY}` },
     withCredentials: true,
   });
