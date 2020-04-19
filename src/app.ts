@@ -33,6 +33,11 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  console.log('Entering your application');
+  next();
+});
+
 // Setup Routes
 app.use(userRoutes);
 app.use(newsRoutes);
