@@ -8,8 +8,7 @@ import { decodedType } from '../interfaces/interfaces';
 const auth = async (req:Request, res:Response, next:NextFunction) => {
   try {
     const token:string = `${req.headers.authorization?.replace('Bearer ', '')}`;
-    const decoded = <decodedType> jwt.verify(token, `${process.env.SECRET}`);
-    console.log(decoded);
+    const decoded = <decodedType> jwt.verify(token, `${process.env.JWT_SECRET}`);
     const user = await User.findOne({ _id: decoded._id, 'tokens.token': token });
 
     // Check if user exists
@@ -22,6 +21,7 @@ const auth = async (req:Request, res:Response, next:NextFunction) => {
     req.user = user;
     next();
   } catch (error) {
+    console.log(error);
     res.status(401).send({ error: 'Unable to Authenticate' });
   }
 };
