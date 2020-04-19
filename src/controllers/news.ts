@@ -17,67 +17,6 @@ export const getFeed = async (req :Request, res:Response) => {
     withCredentials: true,
   });
 
-  // Function to strip data and save to the database
-  // const saveNews = async (data:any):Promise<object[]> => {
-  //   try {
-  //     const allData = data.map(async (item:any):Promise<object> => {
-  //       try {
-  //         const isPresentInDB = await News.findOne({
-  //           owner: req.user._id,
-  //           content: `${item.content}`.slice(0, 260),
-  //           publishedAt: new Date(item.publishedAt),
-  //         });
-
-  //         // check if news is within the db
-  //         if (!isPresentInDB) {
-  //           const news = new News({
-  //             author: item.author || 'Unknown',
-  //             title: item.title,
-  //             content: `${item.content}`.slice(0, 260),
-  //             publishedAt: new Date(item.publishedAt),
-  //             newsUrl: item.url,
-  //             imageUrl: item.urlToImage,
-  //             newsId: `${uuidv4()}`,
-  //             owner: req.user._id,
-  //           });
-  //           const savedItems = await news.save();
-  //           return savedItems;
-  //         }
-  //         return { undefined };
-  //       } catch (error) {
-  //         throw Error('Unable to save');
-  //       }
-  //     });
-  //     return Promise.all(allData);
-  //   } catch (error) {
-  //     throw Error('Unable to save outter');
-  //   }
-  // };
-
-  // Strip Data from results of Query
-  // await saveNews(feed);
-
-  // const search = results.data.articles.map((result: any):object => ({
-  //   author: result.author,
-  //   title: result.title,
-  //   content: `${result.content}`.slice(0, 260),
-  //   publishedAt: result.publishedAt,
-  //   newsUrl: result.url,
-  //   imageUrl: result.urlToImage,
-  // }));
-
-  // const userNews = await News.find({ owner: req.user._id });
-  // Strip Data
-  // const newsFeed = userNews.map((item:any) => ({
-  //   author: item.author,
-  //   title: item.title,
-  //   content: item.content,
-  //   publishedAt: item.publishedAt,
-  //   newsUrl: item.newsUrl,
-  //   imageUrl: item.imageUrl,
-  //   newsId: item.newsId,
-  // }));
-
   try {
     // Create an array of promises which can be passed into axios
     allPromises = categories.map((category:any) => getCategoryFeed(category.category, req.user.country, req.body.page));
@@ -100,6 +39,7 @@ export const getFeed = async (req :Request, res:Response) => {
     // Send Response
     res.send({ data: feed });
   } catch (error) {
+    console.log(error);
     res.status(500).send();
   }
 };
@@ -108,7 +48,7 @@ export const getFeed = async (req :Request, res:Response) => {
 export const findNews = async (req: Request, res:Response) => {
   const query = encodeURI(req.params.query);
   try {
-    const results = await axios.get(`${process.env.BASE_API_URL}/everything?q=${query}`, {
+    const results = await axios.get(`${process.env.BASE_NEWS_API_URL}/everything?q=${query}`, {
       headers: { Authorization: `Bearer ${process.env.NEWS_API_KEY}` },
       withCredentials: true,
     });
