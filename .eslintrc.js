@@ -20,6 +20,7 @@ module.exports = {
         "import/prefer-default-export": 0,
         "@typescript-eslint/no-use-before-define": 0,
         "func-names": 0,
-        "no-underscore-dangle": 0
+        "no-underscore-dangle": 0,
+        "linebreak-style": 0
     }
 };
