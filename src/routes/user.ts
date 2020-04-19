@@ -9,6 +9,7 @@ import {
   updateUserAccount,
   deleteAccount,
   viewAccount,
+  checkUsername,
 } from '../controllers/user';
 // Import authentication
 
@@ -35,5 +36,8 @@ router.delete('/api/v1/profile/delete', auth, deleteAccount);
 
 // Get User account
 router.get('/api/v1/profile', auth, viewAccount);
+
+// Get User Name Validity
+router.get('/api/v1/username/:username', checkUsername);
 
 export default router;

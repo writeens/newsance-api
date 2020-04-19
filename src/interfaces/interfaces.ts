@@ -13,12 +13,12 @@ export interface IUser extends Document {
   // Index Signature for mapping
   [index: string]: any
   // Type checking functions
-  generateAuthToken: () => string
+  generateAuthToken: () => Promise<string>
 }
 
 // To allow static methods, create model interface
 export interface IUserModel extends Model<IUser> {
-  findByCredentials: (email:string, password:string) => IUser
+  findByCredentials: (email:string, password:string) => Promise<IUser>
 }
 
 // Interface for decoded payload from JWT

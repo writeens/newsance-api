@@ -30,15 +30,13 @@ const newsSchema = new Schema({
     type: String,
     default: uuidv4,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: 'User',
   },
+}, {
+  timestamps: true,
 });
 
 // Setup method on user schema to remove some items

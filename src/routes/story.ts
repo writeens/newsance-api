@@ -21,7 +21,7 @@ router.put('/api/v1/stories/:id', auth, updateStory);
 // Delete a Droplet/Story
 router.delete('/api/v1/stories/:id', auth, deleteStory);
 
-// Get all Droplets/Stories
+// Get all Droplets/Stories by this user
 router.get('/api/v1/stories', auth, getStories);
 
 // Get a particular Droplet

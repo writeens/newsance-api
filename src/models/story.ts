@@ -12,14 +12,12 @@ const storySchema = new Schema({
       return true;
     },
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
   author: {
     type: Schema.Types.ObjectId,
     required: true,
   },
+}, {
+  timestamps: true,
 });
 
 // Setup Virtual on Story to handle comments

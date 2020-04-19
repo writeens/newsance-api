@@ -85,16 +85,14 @@ const userSchema = new Schema({
     default: '',
   },
   tokens: [tokenSchema],
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
   username: {
     type: String,
     required: true,
     trim: true,
     lowercase: true,
   },
+}, {
+  timestamps: true,
 });
 
 /** Virtual Setup */
@@ -116,6 +114,17 @@ userSchema.virtual('stories', {
  * Methods on Documents
  * Statics on Models
  */
+userSchema.methods.toJSON = async function () {
+  const user = this;
+  const userObject = user.toObject();
+
+  delete userObject.password;
+  delete userObject.tokens;
+  delete userObject.__v;
+
+  return userObject;
+};
+
 // Setup Method to generate Auth Token
 userSchema.methods.generateAuthToken = async function () {
   const user = this;
